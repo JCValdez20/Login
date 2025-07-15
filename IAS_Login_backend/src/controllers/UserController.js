@@ -54,6 +54,8 @@ exports.registerUser = async (req, res) => {
       user_email: user_email,
       user_password: hash,
     });
+
+    send.sendResponseMessage(res, 201, newUser, "User registered successfully");
   } catch (error) {
     return send.sendErrorMessage(res, 500, error);
   }
