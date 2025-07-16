@@ -48,7 +48,6 @@ function LoginRegister({ setMessage }) {
       <h1>Vulnerable React App</h1>
       <div style={{ marginBottom: "20px" }}>
         <button onClick={() => setView("login")}>Login</button>
-        <button onClick={() => setView("register")}>Register</button>
       </div>
       {view === "login" ? (
         <form onSubmit={handleLogin}>
