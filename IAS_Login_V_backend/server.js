@@ -58,28 +58,37 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
-  // Validate required fields
   if (!email || !password) {
     return res.status(400).json({ error: "Email and password are required" });
   }
 
-  // SQL injection vulnerability (still present for demonstration)
-  const query = `SELECT * FROM users WHERE email LIKE '${email}' AND password = '${password}'`;
+  // STILL vulnerable: quotes included for injection to work
+  const query = `SELECT * FROM users WHERE email = '${email}' AND password = '${password}'`;
 
   db.query(query, (err, results) => {
     if (err) {
-      res.status(500).json({ error: err.sqlMessage });
+      res.status(500).json({ error: err.sqlMessage, query });
     } else if (results.length > 0) {
-      // No proper session management
-      res.json({
-        message: `Welcome ${results[0].username}!`,
-        user: results[0],
-      });
+      // Return the matched email from the result if it exists
+      const userMatch = results.find((u) => u.email === email);
+      if (userMatch) {
+        res.json({
+          message: `Welcome ${userMatch.username}!`,
+          user: userMatch,
+        });
+      } else {
+        res.json({
+          message: `Welcome ${results[0].username}!`,
+          user: results[0],
+        });
+      }
     } else {
       res.status(401).json({ error: "Invalid credentials!" });
     }
   });
 });
+
+
 
 app.listen(3001, () => {
   console.log("Vulnerable backend running on port 3001");
